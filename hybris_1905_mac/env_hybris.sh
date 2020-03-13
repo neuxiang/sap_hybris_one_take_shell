@@ -91,13 +91,13 @@ echo Steps to work:
 echo 
 echo "    " 1. Update value \"code_path\", \"hybris_path\", etc in ${shell_config_file_path} file with your local absolute path
 echo "    " 2. Copy this shell and hybris_config.properties to your hybris project newly Created folder, or Update \"dev_project_path\" with your local absolute path
-echo "    " 3. Run commond below and choose development pattern to set up a local Hybris dev folder in \"dev_project_path\": 
+echo "    " 3. Run command below and choose development pattern to set up a local Hybris dev folder in \"dev_project_path\": 
 echo "    " ${dev_project_path}
 echo
 echo "      " ./env_hybris.sh create
 echo
 
-echo "    " Then you can execute following commond:
+echo "    " Then you can execute following command:
 echo
 echo "      " ./env_hybris.sh create --- Create development hybris project with Hybris package and your code and config
 echo "      " ./env_hybris.sh link --- Link custom folder and config file \(local.properties and localextensions.xml\)
@@ -117,22 +117,22 @@ fi
 funExecute(){
     starttime=`date +'%Y-%m-%d %H:%M:%S'`
     echo
-    echo "Commond [$1] start  time:" $starttime
+    echo "Command [$1] start  time:" $starttime
     
     result=$`$1`
     endtime=`date +'%Y-%m-%d %H:%M:%S'`
     
-    echo "Commond [$1] finish time:" $endtime
+    echo "Command [$1] finish time:" $endtime
     
    
 
     if [[ $result =~ "$2" ]] || [ -z "$2" ]
     then
-        echo "Commond [$1] is successful"
+        echo "Command [$1] is successful"
         echo
     else 
         echo "$result"
-        echo "Commond [$1] is failed"
+        echo "Command [$1] is failed"
         echo
         exit
     fi
@@ -238,7 +238,7 @@ fi
 
 if [ ! -d "${dev_project_path}/hybris/bin/custom/$custom_code_folder_name" ]
 then
-    echo "############# Source code is not linked by commond ./env_hybris.sh link #############"
+    echo "############# Source code is not linked by command ./env_hybris.sh link #############"
 fi
 
 
