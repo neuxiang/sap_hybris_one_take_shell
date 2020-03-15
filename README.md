@@ -14,6 +14,12 @@ Other features:
 e.g You can run clean, initialize, update hybris command before server start command with one this shell command.
 3. Add statistic of  start and end time for every ant command.
 
+Updated features:
+[2020-03-15]v1.1
+1. Add -c argument for commands create, link and all. It means you can copy everthing to your new project, not link.
+2. Add -l argument for command create. It means you need to add -l to get command link run after command create.
+3. Add open command. You can open created project in finder.
+4. Add variable HYBRIS_HOME_DIR, INITIAL_ADMIN, ANT_HOME setting.
 
 
 ############################ Guide ############################
@@ -26,10 +32,10 @@ Steps to work:
 
        ./env_hybris.sh create
 
-Then you can execute following commond:
+Then you can execute following Commands:
 
-       ./env_hybris.sh create --- Create development hybris project with Hybris package and your code and config
-       ./env_hybris.sh link --- Link custom folder and config file (local.properties and localextensions.xml)
+       ./env_hybris.sh create --- Create development hybris project with Hybris package and your code and config. -c means copy command (cp), -l run [./env_hybris.sh link ]
+       ./env_hybris.sh link --- Link(ln) custom folder and config file (local.properties and localextensions.xml), -c means copy command (cp)
        ./env_hybris.sh clean --- ant clean
        ./env_hybris.sh build --- ant all. -c "ant clean" and "ant all"
        ./env_hybris.sh update --- ant updatesystem
@@ -37,6 +43,7 @@ Then you can execute following commond:
        ./env_hybris.sh start --- start server. -d "debug", -c "ant clean", -b "ant all", -h without console outprint,
        -i "ant initialize", -u "ant updatesystem"
 
-   *   ./env_hybris.sh all --- execute "create", "link", "ant clean all", "init", "start"
+   *   ./env_hybris.sh all --- execute "create", "link", "ant clean all", "init", "start". -c means copy command (cp)
        ./env_hybris.sh stop --- stop server
+       ./env_hybris.sh open --- open the created project folder in Finder
        ./env_hybris.sh help --- help

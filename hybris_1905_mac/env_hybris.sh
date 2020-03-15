@@ -16,7 +16,7 @@
 # WeChat: neuxiang
 
 # Date: 2020-03-08
-# Version: 1.0
+# Version: 1.1
 
 
 shell_config_file_path=./hybris_config.properties
@@ -57,7 +57,15 @@ custom_code_path=$code_path/$custom_code_folder_name
 config_code_path=$code_path/$config_file_folder_name
 #------------------------------------------------------------------------------#
 #################################################################################
+#################  Set environment variables   ##################################
+export HYBRIS_HOME_DIR=${dev_project_path}
+export ANT_HOME=${HYBRIS_HOME_DIR}/hybris/bin/platform/apache-ant 
+# export PATH=${PATH}:${ANT_HOME}/bin
+export INITIAL_ADMIN=${pass_word}
 
+echo export HYBRIS_HOME_DIR=${dev_project_path}
+echo export ANT_HOME=${HYBRIS_HOME_DIR}/hybris/bin/platform/apache-ant
+echo export INITIAL_ADMIN=${pass_word}
 ########### DON'T CHANGE FOLLOWING CODE! ###########
 
 if [ "${dev_project_path}" = "." ]
@@ -97,20 +105,21 @@ echo
 echo "      " ./env_hybris.sh create
 echo
 
-echo "    " Then you can execute following command:
+echo "    " Then you can execute following Commands:
 echo
-echo "      " ./env_hybris.sh create --- Create development hybris project with Hybris package and your code and config
-echo "      " ./env_hybris.sh link --- Link custom folder and config file \(local.properties and localextensions.xml\)
-echo "      " ./env_hybris.sh clean --- ant clean
-echo "      " ./env_hybris.sh build --- ant all. -c \"ant clean\" and \"ant all\"
-echo "      " ./env_hybris.sh update --- ant updatesystem
-echo "      " ./env_hybris.sh init --- ant initialize
-echo "      " ./env_hybris.sh start --- start server. -d \"debug\", -c \"ant clean\", -b \"ant all\", -h without console outprint,
-echo "      " -i \"ant initialize\", -u \"ant updatesystem\"
+echo "      " "./env_hybris.sh create --- Create development hybris project with Hybris package and your code and config. -c means copy command (cp), -l run [./env_hybris.sh link ]"
+echo "      " "./env_hybris.sh link --- Link(ln) custom folder and config file (local.properties and localextensions.xml), -c means copy command (cp)"
+echo "      " "./env_hybris.sh clean --- ant clean"
+echo "      " "./env_hybris.sh build --- ant all. -c \"ant clean\" and \"ant all\""
+echo "      " "./env_hybris.sh update --- ant updatesystem"
+echo "      " "./env_hybris.sh init --- ant initialize"
+echo "      " "./env_hybris.sh start --- start server. -d \"debug\", -c \"ant clean\", -b \"ant all\", -h without console outprint,"
+echo "      " "-i \"ant initialize\", -u \"ant updatesystem\""
 echo
-echo "   *  " ./env_hybris.sh all --- execute \"create\", \"link\", \"ant clean all\", \"init\", \"start\"
-echo "      " ./env_hybris.sh stop --- stop server
-echo "      " ./env_hybris.sh help --- help
+echo "   *  " "./env_hybris.sh all --- execute \"create\", \"link\", \"ant clean all\", \"init\", \"start\". -c means copy command (cp)"
+echo "      " "./env_hybris.sh stop --- stop server"
+echo "      " "./env_hybris.sh open --- open the created project folder in Finder"
+echo "      " "./env_hybris.sh help --- help"
 echo
 fi
 
@@ -154,6 +163,85 @@ funExecuteByArg(){
    
 }
 
+funRemove(){
+
+    if [ -L "$1" ]
+    then
+        echo "Remove link $1"
+        rm "$1"
+    elif [ -d "$1" ] || [ -f "$1" ]
+    then
+        echo "Remove $1"
+        rm  -rf "$1"
+    else
+        echo "Don't find $1"
+    fi
+}
+
+funGenerate(){
+
+    sourcePath=$1
+    targetPath=$2
+    fileName=$3
+   
+    if [ ! -z $fileName ]
+    then
+        if [ ! -d $targetPath ]
+        then
+            echo "Make directory [$targetPath]"
+            result=`mkdir -p "$targetPath"`
+        fi
+        sourcePath="$1/$3"
+        targetPath="$2/$3"
+    fi
+    
+    result=$(funIsExisting -c 4 $@)
+
+    if [ "$result" = "y" ]
+    then
+        echo "Copy [$sourcePath] to [$targetPath]"
+        cp -R $sourcePath $targetPath
+    else
+        echo "Link [$sourcePath] to [$targetPath]"
+        ln -s "$sourcePath" "$targetPath"
+    fi
+}
+
+funHybrisGenFolder(){
+    funGenerate "${hybris_path}/$1" "${dev_project_path}/$1" "" $@
+}
+
+funIsExisting(){
+    selectedArg=$1
+    startIndex=`expr $2 + 2`
+    index=0
+  
+    for arg in $* 
+    do
+        let index+=1
+        if [ $index -ge $startIndex ] && [ "$arg" = "$selectedArg" ]
+        then
+            echo "y"
+            break
+        fi
+
+    done
+}
+
+
+funLink(){
+    echo
+    echo ===================== Link source code start =============================
+    funRemove ${dev_project_path}/hybris/config/local.properties
+    funRemove ${dev_project_path}/hybris/config/localextensions.xml
+    funRemove ${dev_project_path}/hybris/bin/custom/$custom_code_folder_name
+    funGenerate "${config_code_path}" "${dev_project_path}/hybris/config" "local.properties" $@
+    funGenerate "${config_code_path}" "${dev_project_path}/hybris/config" "localextensions.xml" $@
+    funGenerate "${custom_code_path}" "${dev_project_path}/hybris/bin/custom" "" $@
+    echo ===================== Link source code finish ============================
+    echo
+}
+
 funStartServer(){
 
     if [[ $@ =~ "-d" ]] 
@@ -175,38 +263,47 @@ funStartServer(){
 
 if [ "$1" = "all" ] || [ "$1" = "create" ]
 then
-   echo ===================== Create development work space =====================
-   echo START TIME: $(date +"%Y-%m-%d %T")
-   echo ===================== Remove existing files =============================
-    rm ${dev_project_path}/build-tools
-    rm ${dev_project_path}/c4c-integration
-    rm ${dev_project_path}/hybris-sbg
-    rm ${dev_project_path}/installer
-    rm ${dev_project_path}/licenses
+    echo ===================== Create development work space =============
+    echo START TIME: $(date +"%Y-%m-%d %T")
+  
+    echo ===================== Remove existing files =====================
+    funRemove ${dev_project_path}/build-tools
+    funRemove ${dev_project_path}/c4c-integration
+    funRemove ${dev_project_path}/hybris-sbg
+    funRemove ${dev_project_path}/installer
+    funRemove ${dev_project_path}/licenses
 
-    rm -rf  ${dev_project_path}/hybris
-
-    echo =====================Creat hybris path link=====================
-    ln -s ${hybris_path}/build-tools ${dev_project_path}
-    ln -s ${hybris_path}/c4c-integration ${dev_project_path}
-    ln -s ${hybris_path}/hybris-sbg ${dev_project_path}
-    ln -s ${hybris_path}/installer ${dev_project_path}
-    ln -s ${hybris_path}/licenses ${dev_project_path}
+    funRemove ${dev_project_path}/hybris
 
 
-    echo =====================Create hybris bin folder=====================
-    mkdir ${dev_project_path}/hybris
-    mkdir ${dev_project_path}/hybris/bin
-    mkdir ${dev_project_path}/hybris/bin/custom
+    echo =============== Create hybris project bin folder ================
+    
+    if [ ! -d "${dev_project_path}/hybris/bin/custom" ]
+    then
+        mkdir -p "$dev_project_path/hybris/bin/custom"
+        echo Create folder: $dev_project_path/hybris/bin/custom
+    fi
 
-    ln -s ${hybris_path}/hybris/bin/modules ${dev_project_path}/hybris/bin/modules
-    cp -r ${hybris_path}/hybris/bin/platform ${dev_project_path}/hybris/bin/platform
+    funHybrisGenFolder "hybris/bin/modules" $@
+    funHybrisGenFolder "hybris/bin/platform" "create" "-c"
 
-    echo =====================Initialize to build code ====================
+    echo ======= Creat hybris project with Hybris package folder =========
+
+    funHybrisGenFolder "build-tools" $@
+    funHybrisGenFolder "c4c-integration" $@
+    funHybrisGenFolder "hybris-sbg" $@
+    funHybrisGenFolder "installer" $@
+    funHybrisGenFolder "licenses" $@
+
+    echo ===================== Initialize to build code ==================
     cd ${dev_project_path}/hybris/bin/platform
     . ./setantenv.sh
     ant all
-    
+
+    if [[ "$@" =~ "-l" ]]
+    then
+        funLink $@
+    fi
     echo END TIME: $(date +"%Y-%m-%d %T")
 
 fi
@@ -215,15 +312,7 @@ fi
 if [ "$1" = "all" ] || [ "$1" = "link" ]
 then
 
-    echo
-    echo ===================== Link source code start=============================
-    rm -rf ${dev_project_path}/hybris/config/local.properties
-    rm -rf ${dev_project_path}/hybris/config/localextensions.xml
-    ln -s ${config_code_path}/local.properties ${dev_project_path}/hybris/config/local.properties 
-    ln -s ${config_code_path}/localextensions.xml ${dev_project_path}/hybris/config/localextensions.xml
-    ln -s ${custom_code_path} ${dev_project_path}/hybris/bin/custom
-    echo ===================== Link source code finish============================
-    echo
+    funLink $@
  fi
 
 
@@ -238,10 +327,16 @@ fi
 
 if [ ! -d "${dev_project_path}/hybris/bin/custom/$custom_code_folder_name" ]
 then
-    echo "############# Source code is not linked by command ./env_hybris.sh link #############"
+    echo "############# Source code is not linked by Command ./env_hybris.sh link #############"
 fi
 
+if [ "$1" = "open" ]
+then
+    
+    cd ${dev_project_path}
+    open .
 
+fi
 
 if [ "$1" = "all" ] || [ "$1" = "clean" ]
 then
@@ -253,14 +348,14 @@ if [ "$1" = "all" ] || [ "$1" = "build" ]
 then
     
 
-    if [ "$2" = "-c" ]
+    if [ "$2" = "-c" ] && [ "$1" = "build" ]
     then
-    echo ===================== clean code =======================================
-        funExecute "ant clean" "BUILD SUCCESSFUL"
-    fi
-
+    echo ===================== clean and build code =============================
+        funExecute "ant clean all" "BUILD SUCCESSFUL"
+    else
     echo ===================== build code =======================================
         funExecute "ant all" "BUILD SUCCESSFUL"
+    fi
     
 fi
 
@@ -295,7 +390,6 @@ fi
 if [ "$1" = "stop" ]
 then
     echo ===================== stop server =======================================
-    
     ./hybrisserver.sh stop
     
 fi
