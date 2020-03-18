@@ -319,7 +319,7 @@ then
 if [ -d "${dev_project_path}/hybris/bin/platform" ]
 then
     cd ${dev_project_path}/hybris/bin/platform
-    funExecute ". ./setantenv.sh"
+    . ./setantenv.sh
 else
   echo Hybirs project is not created.
   exit
