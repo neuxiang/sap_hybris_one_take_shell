@@ -15,12 +15,16 @@ e.g You can run clean, initialize, update hybris command before server start com
 3. Add statistic of  start and end time for every ant command.
 
 Updated features:
-[2020-03-15]v1.1
+
+[2020-03-15] v1.1
 1. Add -c argument for commands create, link and all. It means you can copy everthing to your new project, not link.
 2. Add -l argument for command create. It means you need to add -l to get command link run after command create.
 3. Add open command. You can open created project in finder.
 4. Add variable HYBRIS_HOME_DIR, INITIAL_ADMIN, ANT_HOME setting.
 
+[2020-03-21] v1.2
+1. Support original ant command. You can run ant command as before with this shell.
+2. Add josn file for initialize and update. Add -j to get it worked
 
 ############################ Guide ############################
 Steps to work:
@@ -38,12 +42,12 @@ Then you can execute following Commands:
        ./env_hybris.sh link --- Link(ln) custom folder and config file (local.properties and localextensions.xml), -c means copy command (cp)
        ./env_hybris.sh clean --- ant clean
        ./env_hybris.sh build --- ant all. -c "ant clean" and "ant all"
-       ./env_hybris.sh update --- ant updatesystem
-       ./env_hybris.sh init --- ant initialize
+       ./env_hybris.sh update --- ant updatesystem, -j run with config json file
+       ./env_hybris.sh init --- ant initialize, -j run with config json file
        ./env_hybris.sh start --- start server. -d "debug", -c "ant clean", -b "ant all", -h without console outprint,
-       -i "ant initialize", -u "ant updatesystem"
-
-   *   ./env_hybris.sh all --- execute "create", "link", "ant clean all", "init", "start". -c means copy command (cp)
+       -i "ant initialize", -u "ant updatesystem", -j run with config json file
+       
+       [./env_hybris.sh all --- execute "create", "link", "ant clean all", "init", "start". -c means copy command (cp), , -j run with config json file]
        ./env_hybris.sh stop --- stop server
        ./env_hybris.sh open --- open the created project folder in Finder
        ./env_hybris.sh help --- help

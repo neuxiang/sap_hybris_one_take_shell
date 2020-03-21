@@ -1,0 +1,12 @@
+{
+  "init": "Go",
+  "initmethod": "init",
+  "essential": "true",
+  "localizetypes": "true",
+  "droptables": "droptables",
+  "createProjectData": "true",
+  "basecommerce_create geocoding cron job": [
+    "no"
+  ],
+  "filteredPatches": "true"
+}

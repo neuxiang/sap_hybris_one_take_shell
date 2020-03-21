@@ -16,7 +16,7 @@
 # WeChat: neuxiang
 
 # Date: 2020-03-08
-# Version: 1.1
+# Version: 1.2
 
 
 shell_config_file_path=./hybris_config.properties
@@ -45,10 +45,10 @@ source ${shell_config_file_path}
  hybris_path=${hybris_path}
 
 # Config file to initialize
-# init_config_json_file=init_config.json
+ init_config_json_file=${init_config_json_file}
 
 # Config file to update
-# update_config_json_file=update_config.json
+ update_config_json_file=${update_config_json_file}
 
 # The absolute path of source code for hybris folder bin/custom
 custom_code_path=$code_path/$custom_code_folder_name
@@ -111,12 +111,12 @@ echo "      " "./env_hybris.sh create --- Create development hybris project with
 echo "      " "./env_hybris.sh link --- Link(ln) custom folder and config file (local.properties and localextensions.xml), -c means copy command (cp)"
 echo "      " "./env_hybris.sh clean --- ant clean"
 echo "      " "./env_hybris.sh build --- ant all. -c \"ant clean\" and \"ant all\""
-echo "      " "./env_hybris.sh update --- ant updatesystem"
-echo "      " "./env_hybris.sh init --- ant initialize"
+echo "      " "./env_hybris.sh update --- ant updatesystem, -j run with config json file"
+echo "      " "./env_hybris.sh init --- ant initialize, -j run with config json file"
 echo "      " "./env_hybris.sh start --- start server. -d \"debug\", -c \"ant clean\", -b \"ant all\", -h without console outprint,"
-echo "      " "-i \"ant initialize\", -u \"ant updatesystem\""
+echo "      " "-i \"ant initialize\", -u \"ant updatesystem\", -j run with config json file"
 echo
-echo "   *  " "./env_hybris.sh all --- execute \"create\", \"link\", \"ant clean all\", \"init\", \"start\". -c means copy command (cp)"
+echo "      " "./env_hybris.sh all --- execute \"create\", \"link\", \"ant clean all\", \"init\", \"start\". -c means copy command (cp), , -j run with config json file"
 echo "      " "./env_hybris.sh stop --- stop server"
 echo "      " "./env_hybris.sh open --- open the created project folder in Finder"
 echo "      " "./env_hybris.sh help --- help"
@@ -338,6 +338,11 @@ then
 
 fi
 
+if [ "$1" = "ant" ]
+then
+    $*
+fi
+
 if [ "$1" = "all" ] || [ "$1" = "clean" ]
 then
     echo ===================== clean code =======================================
@@ -362,15 +367,26 @@ fi
 if [ "$1" = "update" ]
 then
    echo ===================== update database ===================================
+   if [[ "$2" =~ "-j" ]]
+   then
+        funExecute "ant updatesystem -DconfigFile=${update_config_json_file}" "BUILD SUCCESSFUL"
+    else
         funExecute "ant updatesystem" "BUILD SUCCESSFUL"
-   
+    fi
+
+
 fi
 
 if [ "$1" = "all" ] || [ "$1" = "init" ]
 then
    echo ===================== initialize database ===============================
-   funExecute "ant initialize" "BUILD SUCCESSFUL"
-   
+   if [[ "$@" =~ "-j" ]]
+   then
+        funExecute "ant initialize -DconfigFile=${init_config_json_file}" "BUILD SUCCESSFUL"
+    else
+        funExecute "ant initialize" "BUILD SUCCESSFUL"
+    fi
+
 fi
 
 
@@ -380,8 +396,15 @@ then
 
     funExecuteByArg "-c" "ant clean all" "BUILD SUCCESSFUL" $@
     funExecuteByArg "-b" "ant all" "BUILD SUCCESSFUL" $@
-    funExecuteByArg "-i" "ant initialize" "BUILD SUCCESSFUL" $@
-    funExecuteByArg "-u" "ant updatesystem" "BUILD SUCCESSFUL" $@
+    if [[ $@ =~ "-j" ]]
+    then
+        funExecuteByArg "-i" "ant initialize  -DconfigFile=${init_config_json_file}" "BUILD SUCCESSFUL" $@
+        funExecuteByArg "-u" "ant updatesystem  -DconfigFile=${update_config_json_file}" "BUILD SUCCESSFUL" $@
+    else
+        funExecuteByArg "-i" "ant initialize" "BUILD SUCCESSFUL" $@
+        funExecuteByArg "-u" "ant updatesystem" "BUILD SUCCESSFUL" $@
+    fi
+
     funStartServer $@
 
 fi

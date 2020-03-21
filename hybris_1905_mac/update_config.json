@@ -1,0 +1,10 @@
+{
+  "init": "Go",
+  "basecommerce_create geocoding cron job": [
+    "no"
+  ],
+  "patch_validation": [
+    "ba04041624e635f97ebd48c2d9fbdf26"
+  ],
+  "filteredPatches": "true"
+}
