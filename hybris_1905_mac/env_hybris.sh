@@ -55,6 +55,9 @@ custom_code_path=$code_path/$custom_code_folder_name
 
 # The absolute path of config files for hybris folder config
 config_code_path=$code_path/$config_file_folder_name
+
+java_home=${java_home}
+
 #------------------------------------------------------------------------------#
 #################################################################################
 #################  Set environment variables   ##################################
@@ -62,10 +65,14 @@ export HYBRIS_HOME_DIR=${dev_project_path}
 export ANT_HOME=${HYBRIS_HOME_DIR}/hybris/bin/platform/apache-ant 
 # export PATH=${PATH}:${ANT_HOME}/bin
 export INITIAL_ADMIN=${pass_word}
+export JAVA_HOME=${java_home}
+
 
 echo export HYBRIS_HOME_DIR=${dev_project_path}
 echo export ANT_HOME=${HYBRIS_HOME_DIR}/hybris/bin/platform/apache-ant
 echo export INITIAL_ADMIN=${pass_word}
+echo export JAVA_HOME=${java_home}
+
 ########### DON'T CHANGE FOLLOWING CODE! ###########
 
 if [ "${dev_project_path}" = "." ]
