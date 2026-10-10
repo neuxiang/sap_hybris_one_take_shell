@@ -1,0 +1,9 @@
+{
+  "init": "Go",
+  "dryrun": "false",
+  "initmethod": "update",
+  "clearhmc": "false",
+  "essential": "false",
+  "localizetypes": "true",
+  "lucenesearch_rebuild.indexes": "false"
+}

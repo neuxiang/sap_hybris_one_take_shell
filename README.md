@@ -26,27 +26,36 @@ Updated features:
 1. Support original ant command. You can run ant command as before with this shell.
 2. Add josn file for initialize and update. Add -j to get it worked
 
+[2026-10-10] v1.3 (hybris_general_mac)
+1. Add upgrade command: backup data(hsqldb/media/solr) to tar, replace platform/modules, restore data, ant clean all, renew license. -u to run ant updatesystem after upgrade.
+2. Add renewlicense command: delete & recreate temporary demo license (default product CPS_SQL).
+3. update command now always uses update_config.json (fine-grained: type system + localizations only, no essential/project data).
+4. Config json file paths support relative path (resolved relative to script's directory).
+5. hybris_1905_mac is the legacy version (kept as-is). hybris_general_mac is the general version with new features.
+
 ############################ Guide ############################
 Steps to work:
 
      1. Update value "code_path", "hybris_path", etc in ./hybris_config.properties file with your local absolute path
      2. Copy this shell and hybris_config.properties to your hybris project newly Created folder, or Update "dev_project_path" with your local absolute path
      3. Run commond below and choose development pattern to set up a local Hybris dev folder in "dev_project_path":
-     /Users/.../hybris_1905_mac
+     /Users/.../hybris_general_mac
 
        ./env_hybris.sh create
 
 Then you can execute following Commands:
 
        ./env_hybris.sh create --- Create development hybris project with Hybris package and your code and config. -c means copy command (cp), -l run [./env_hybris.sh link ]
+       ./env_hybris.sh upgrade --- Upgrade SAP Commerce package: backup data, replace platform/modules, restore data, ant clean all, renew license. -u run ant updatesystem (with config json) after upgrade
        ./env_hybris.sh link --- Link(ln) custom folder and config file (local.properties and localextensions.xml), -c means copy command (cp)
        ./env_hybris.sh clean --- ant clean
        ./env_hybris.sh build --- ant all. -c "ant clean" and "ant all"
-       ./env_hybris.sh update --- ant updatesystem, -j run with config json file
+       ./env_hybris.sh update --- ant updatesystem with config json file (type system + localizations only)
+       ./env_hybris.sh renewlicense --- Renew expired demo license (delete & recreate temp license, default product CPS_SQL)
        ./env_hybris.sh init --- ant initialize, -j run with config json file
        ./env_hybris.sh start --- start server. -d "debug", -c "ant clean", -b "ant all", -h without console outprint,
        -i "ant initialize", -u "ant updatesystem", -j run with config json file
-       
+
        [./env_hybris.sh all --- execute "create", "link", "ant clean all", "init", "start". -c means copy command (cp), , -j run with config json file]
        ./env_hybris.sh stop --- stop server
        ./env_hybris.sh open --- open the created project folder in Finder
