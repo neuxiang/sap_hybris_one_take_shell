@@ -32,6 +32,7 @@ Updated features:
 3. update command now always uses update_config.json (fine-grained: type system + localizations only, no essential/project data).
 4. Config json file paths support relative path (resolved relative to script's directory).
 5. hybris_1905_mac is the legacy version (kept as-is). hybris_general_mac is the general version with new features.
+6. start command checks occupied ports before starting (8000=JDWP debug, 8983=Solr, 9001=HAC, 9002=Backoffice): tries graceful stop first, then force kill as fallback.
 
 ############################ Guide ############################
 Steps to work:

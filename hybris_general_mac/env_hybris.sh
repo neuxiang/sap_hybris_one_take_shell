@@ -264,20 +264,49 @@ funLink(){
 
 funStartServer(){
 
-    # Check and kill processes occupying hybris ports before starting
+    # Check and release hybris ports before starting
     echo ===================== check port occupancy ============================
-    local hybris_ports=("8000" "9001" "9002")
+    # 8000=JDWP debug, 8983=Solr, 9001=HAC, 9002=Backoffice
+    local hybris_ports=("8000" "8983" "9001" "9002")
+
+    # Detect whether any port is occupied
+    local port_occupied="no"
     for port in "${hybris_ports[@]}"; do
-        local pids=$(lsof -ti :${port} 2>/dev/null)
-        if [ -n "${pids}" ]; then
-            echo "Port ${port} is in use by PID(s): ${pids}, killing..."
-            for pid in ${pids}; do
-                kill -9 ${pid} 2>/dev/null
-            done
-            sleep 2
-            echo "Port ${port} released."
+        if [ -n "$(lsof -ti :${port} 2>/dev/null)" ]; then
+            port_occupied="yes"
+            echo "Port ${port} is in use."
         fi
     done
+
+    if [ "${port_occupied}" = "yes" ]; then
+        # Step 1: try graceful stop first (releases Solr index lock / DB transaction)
+        echo "Trying graceful stop..."
+        ./hybrisserver.sh stop >/dev/null 2>&1 &
+        local stop_pid=$!
+        # wait up to 15s for graceful stop to finish
+        for i in $(seq 1 15); do
+            if ! kill -0 ${stop_pid} 2>/dev/null; then
+                break
+            fi
+            sleep 1
+        done
+        kill -9 ${stop_pid} 2>/dev/null
+
+        # Step 2: force kill any port still occupied
+        for port in "${hybris_ports[@]}"; do
+            local pids=$(lsof -ti :${port} 2>/dev/null)
+            if [ -n "${pids}" ]; then
+                echo "Port ${port} still in use by PID(s): ${pids}, killing..."
+                for pid in ${pids}; do
+                    kill -9 ${pid} 2>/dev/null
+                done
+                sleep 2
+                echo "Port ${port} released."
+            fi
+        done
+    else
+        echo "No hybris port occupied."
+    fi
 
     if [[ $@ =~ "-d" ]]
     then
